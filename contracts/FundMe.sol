@@ -21,5 +21,18 @@ contract FundMe {
             address funder = funders[i];
             addressToAmountFunded[funder] = 0;
         }
+        funders = new address[](0); // reset the array
+
+        // Withdraw funds: 3 methods but stick to "call" method
+        // transfer (2300 gas): reverts automatically and does not need the require statement
+        // payable(msg.sender).transfer(address(this).balance);
+
+        // Send (2300 gas): Does not revert automatically, hence, needs the require statement
+        // bool sendSuccess = payable(msg.sender).send(address(this).balance);
+        // require(sendSuccess, "Send failed!");
+
+        // Call (forward all gas): Does not revert automatically, hence, needs the require statement
+        (bool callSuccess, ) = payable(msg.sender).call{value: address(this).balance}("");
+        require(callSuccess, "Call failed!");
     }
 }
